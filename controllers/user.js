@@ -8,17 +8,20 @@
 const Deck = require("../models/Deck");
 const User = require("../models/User");
 
-const { JWT_SECRET } = require('../configs')
-const JWT = require('jsonwebtoken')
+const { JWT_SECRET } = require("../configs");
+const JWT = require("jsonwebtoken");
 
 const encodedToken = (userID) => {
-  return JWT.sign({
-    iss: 'Tran Toan',
-    sub: userID,
-    iat: new Date().getTime(),
-    exp: new Date().setDate(new Date().getDate() + 3)
-  }, JWT_SECRET)
-}
+  return JWT.sign(
+    {
+      iss: "Hoang Tin",
+      sub: userID,
+      iat: new Date().getTime(),
+      exp: new Date().setDate(new Date().getDate() + 3),
+    },
+    JWT_SECRET
+  );
+};
 
 const getUser = async (req, res, next) => {
   const { userID } = req.value.params;
@@ -87,29 +90,34 @@ const replaceUser = async (req, res, next) => {
 };
 
 const secret = async (req, res, next) => {
-  return res.status(200).json({ resources: true })
+  return res.status(200).json({ resources: true });
 };
 
 const signIn = async (req, res, next) => {
-  console.log("Called to signIn function.");
+  const token = encodedToken(req.user._id);
+  res.setHeader("Authentication", token);
+  return res.status(200).json({ success: true });
 };
 
 const signUp = async (req, res, next) => {
-  const { firstName, lastName, email, password } = req.value.body
+  const { firstName, lastName, email, password } = req.value.body;
 
   // Check if there is a user with the same user
-  const foundUser = await User.findOne({ email })
-  if (foundUser) return res.status(403).json({ error: { message: 'Email is already in use.' }})
+  const foundUser = await User.findOne({ email });
+  if (foundUser)
+    return res
+      .status(403)
+      .json({ error: { message: "Email is already in use." } });
 
   // Create a new user
-  const newUser = new User({ firstName, lastName, email, password })
-  newUser.save()
+  const newUser = new User({ firstName, lastName, email, password });
+  newUser.save();
 
   // Encode a token
-  const token = encodedToken(newUser._id)
+  const token = encodedToken(newUser._id);
 
-  res.setHeader('Authorization', token)
-  return res.status(201).json({ success: true })
+  res.setHeader("Authorization", token);
+  return res.status(201).json({ success: true });
 };
 
 const updateUser = async (req, res, next) => {
