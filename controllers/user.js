@@ -1,5 +1,5 @@
 /**
- * We can interact with mongoose in three diffirent ways:
+ * We can interact with mongoose in three different ways:
  * [v] Callback
  * [v] Promises
  * [v] Async/await (Promises)
@@ -21,6 +21,18 @@ const encodedToken = (userID) => {
     },
     JWT_SECRET
   );
+};
+
+const authGoogle = async (req, res, next) => {
+  const token = encodedToken(req.user._id);
+  res.setHeader("Authentication", token);
+  return res.status(200).json({ success: true });
+};
+
+const authFacebook = async (req, res, next) => {
+  const token = encodedToken(req.user._id);
+  res.setHeader("Authentication", token);
+  return res.status(200).json({ success: true });
 };
 
 const getUser = async (req, res, next) => {
@@ -142,4 +154,6 @@ module.exports = {
   signIn,
   signUp,
   updateUser,
+  authGoogle,
+  authFacebook,
 };
